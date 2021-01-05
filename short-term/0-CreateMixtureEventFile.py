@@ -7,12 +7,12 @@ Weather: EventId, Type(W/T), RefinedType, StartTime(UTC), EndTime(UTC), AirportC
 '''
 import random
 
-main_path = '/users/PAS0536/osu9965/Traffic/EventProcessing/Data/'
-traffic_path = '/users/PAS0536/osu9965/Traffic/Output/'
-files = ['All_Weather_Events_Feb2016_Aug2018', 'MapQuest-Augmented_Refined']
+main_path = './data/'
+traffic_path = './data/'
+files = ['WeatherEvents_Aug16_June20_Publish', 'TrafficEvents_Aug16_June20_Publish']
 
 
-writer = open(main_path + 'AllEvents_EntireData.csv', 'w');
+writer = open(main_path + 'AllEvents_EntireData.csv', 'w')
 writer.write('EventId,Type(W/T),RefinedType,StartTime(UTC),EndTime(UTC),LocationLat,LocationLng,Distance(mi),AirportCode,Number,Street,Side,City,County,State,ZipCode\n')
 
 weatherId = set()
@@ -42,9 +42,8 @@ for f in files:
                     parts[25] = 'N/A'
                 else:
                     parts[25] = parts[25].split('-')[0]
-                writer.write('T-' + str(id) + ',T,' + parts[4] + ',' + parts[11] + ',' + parts[12] + ',' + parts[6] + ',' + parts[7] + ',' + parts[10] +
-                             ',' + parts[27] + ',' + parts[18] + ',' + parts[19] + ',' + parts[20] + ',' + parts[21] + ',' + 
-                             parts[22] + ',' + parts[23] + ',' + parts[25] + '\n')
+                writer.write('T-' + str(id) + ',T,' + parts[1] + '-' + parts[2] + ',' + parts[5] + ',' + parts[6] + ',' + parts[8] + ',' + parts[9] + ',' + parts[10] + ',' + parts[11] +
+                             ',' + parts[12] + ',' + parts[13] + ',' + parts[14] + ',' + parts[15] + ',' + parts[16] + ',' + parts[17] + ',' + parts[18] + '\n')
                 trafficId.add(id)
                 
             else:  #This is weather event file
@@ -52,8 +51,8 @@ for f in files:
                 if rnd < 0:
                     continue
                 id = len(weatherId) + 1
-                writer.write('W-' + str(id) + ',W,' + parts[1] + '-' + parts[2] + ',' + parts[3] + ',' + parts[4] + ',N/A,N/A,N/A,' + parts[0] +
-                              ',N/A,N/A,N/A,N/A,N/A,N/A,N/A\n')
+                writer.write('W-' + str(id) + ',W,' + parts[1] + '-' + parts[2] + ',' + parts[3] + ',' + parts[4] + ',' + parts[6] + ',' + parts[7] + ',N/A,' + parts[8] + ',N/A,N/A,N/A,'
+                            + parts[9] + ',' + parts[10] + ',' + parts[11] + ',' + parts[12] + '\n')
                 weatherId.add(id)
             
                 
