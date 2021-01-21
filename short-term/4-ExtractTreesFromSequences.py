@@ -3,16 +3,16 @@ Created on Jul 7, 2018, Modified on Aug 27
 Using this code, we extract tree structures out of sequences of patterns for different zip-codes. 
 This way, we first extract raw tree structures, then apply DFS and generate the sequence encoding, as it is interpretable by TreeMiner C++ code. 
 Modification: We have following label conversion here:
-    snow-heavy, snow-moderate, snow-light ==> snow
-    rain-heavy, rain-moderate, rain-light ==> rain
+    Snow-Heavy, Snow-Moderate, Snow-Light ==> Snow
+    Rain-Heavy, Rain-Moderate, Rain-Light ==> Rain
     construction-short, construction, Construction-Other ==> construction
-    congestion-slow, congestion-moderate, congestion-fast ==> congestion
+    congestion-slow, congestion-Moderate, congestion-fast ==> congestion
     event-short, event-long ==> event
-    fog-moderate, fog-severe ==> fog
+    Fog-Moderate, Fog-Severe ==> Fog
 The rest of the types will remain as before. 
 @author: sobhan
 '''
-import cPickle
+import pickle
 
 class node:
     label = ''
@@ -78,13 +78,13 @@ def createBasicUnorderedRootedTreeStructures():
 def createLabelToCode():
     labelToCode = {}
     
-    labelToCode['snow-light'] = '1'
-    labelToCode['snow-moderate'] = '1'
-    labelToCode['snow-heavy'] = '1'
+    labelToCode['Snow-Light'] = '1'
+    labelToCode['Snow-Moderate'] = '1'
+    labelToCode['Snow-Heavy'] = '1'
     
-    labelToCode['rain-light'] = '2'
-    labelToCode['rain-moderate'] = '2'
-    labelToCode['rain-heavy'] = '2'
+    labelToCode['Rain-Light'] = '2'
+    labelToCode['Rain-Moderate'] = '2'
+    labelToCode['Rain-Heavy'] = '2'
     
     labelToCode['Construction'] = '3'
     labelToCode['Construction-Other'] = '3'
@@ -97,17 +97,17 @@ def createLabelToCode():
     labelToCode['Event-Short'] = '5'
     labelToCode['Event-Long'] = '5'
     
-    labelToCode['fog-moderate'] = '6'
-    labelToCode['fog-severe'] = '6'
+    labelToCode['Fog-Moderate'] = '6'
+    labelToCode['Fog-Severe'] = '6'
     
     labelToCode['Lane-Blocked'] = '7'
-    labelToCode['cold-severe'] = '8'
+    labelToCode['Cold-Severe'] = '8'
     labelToCode['Other'] = '9'
-    labelToCode['storm-severe'] = '10'
+    labelToCode['Storm-Severe'] = '10'
     labelToCode['Broken-Vehicle'] = '11'
     labelToCode['Incident-Weather'] = '12'
-    labelToCode['precipitation-UNK'] = '13'
-    labelToCode['hail-other'] = '14'
+    labelToCode['Precipitation-UNK'] = '13'
+    labelToCode['Hail-Other'] = '14'
     labelToCode['Incident-Other'] = '15'
     labelToCode['Incident-Flow'] = '16'
     labelToCode['Accident'] = '17'
@@ -151,14 +151,17 @@ def convertToTreePreOrderedDfsEncoding():
     return zipToEncoding, labelToCode
                 
                 
-path = 'Data/'
+path = './data/'
 zipToSequences = loadSequenceData()
-print 'Sequences are loaded!'
+print ('Sequences are loaded!')
 zipToNodes,zipToRoots = createBasicUnorderedRootedTreeStructures()
-print 'Trees are created!'
+print ('Trees are created!')
 zipToEncoding, labelToCode = convertToTreePreOrderedDfsEncoding()
-print 'Encodings are created!'
+print ('Encodings are created!')
 
-cPickle.dump(zipToEncoding, file(path + 'zipToEncoding.pkl', 'w'))
-cPickle.dump(labelToCode, file(path + 'labelToCode.pkl', 'w'))
-print 'dumping is completed!'
+with open(path + 'zipToEncoding.pkl', 'wb') as file_write:
+    pickle.dump(zipToEncoding, file_write)
+
+with open(path + 'labelToCode.pkl', 'wb') as file_write:
+    pickle.dump(labelToCode, file_write)
+print ('dumping is completed!')

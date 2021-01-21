@@ -5,12 +5,11 @@ In our traffic incident data, there are some redundant events. Redundant events 
 @author: sobhan
 '''
 
+import pandas as pd
 import time
 import math
 from datetime import date, datetime, timedelta
-import thread
 import threading
-import random
 
 class event:
     eventId = ''
@@ -93,50 +92,54 @@ def loadZipToAirportCode():
 def loadEventData():    
     zip_to_traffic_event = {}
     airport_to_weather_event = {}
-       
+    #CHUNKSIZE = 1000000
     start = time.time()
     count = 0
-           
-    with open(path + 'AllEvents_EntireData.csv', 'r') as events:
-        header = True
-           
-        for r in events:
-            if header:
-                header = False
+
+    #total_traffic = pd.DataFrame()
+    #total_weather = pd.DataFrame()
+
+    events = pd.read_csv(path + 'AllEvents_EntireData.csv', dtype = str) # , chunksize=CHUNKSIZE
+    #chunk_list_traffic = []
+    #chunk_list_weather = []
+    for i, r in events.iterrows():
+        #for i in range(0, len(r)):
+        events = {}
+        if r[1] == 'W':
+            if r[12] in airport_to_weather_event:
+                events = airport_to_weather_event[r[12]]
+            childs = set()
+            parents = set()
+            e = event(eventId=r[0], type='W', refinedType=r[2]+ '-' + r[3], startTime=r[6], endTime=r[7], locationLat=0, locationLng=0,  
+                        distance=0, airportCode=r[12], number=0, street='NA', side='NA', city='NA', county='NA', state='NA', 
+                        zipCode='NA', childs=childs, parents=parents, toBeMerged=False, modified=False)
+            events[e.eventId] = e
+            airport_to_weather_event[r[12]] = events
+        else:
+            if isinstance(r[19], float):
                 continue
-            #rnd = random.random()
-            #if rnd < 0.5: continue
+            if r[19] in zip_to_traffic_event:
+                events = zip_to_traffic_event[r[19]]
+            childs = set()
+            parents = set()
+            refined = ('' if isinstance(r[2], float) else r[2]) + '-' + ('' if isinstance(r[3], float) else r[3])
+
+            e = event(eventId=r[0], type='T', refinedType=refined, startTime=r[6], endTime=r[7], locationLat=float(r[9]), locationLng=float(r[10]), 
+                        distance=float(r[11]), airportCode=r[19], number=(0 if isinstance(r[13], float) else int(r[13])), street=r[14], side=r[15], city=r[16], 
+                        county=r[17], state=r[18], zipCode=r[19], childs=childs, parents=parents, toBeMerged=False, modified=False)
+            events[e.eventId] = e
+            zip_to_traffic_event[r[19]] = events  
             
-            r = r.replace('\r', '').replace('\n', '').split(',')
-            events = {}
-            if r[1] == 'W':
-                if r[8] in airport_to_weather_event:
-                    events = airport_to_weather_event[r[8]]
-                childs = set()
-                parents = set()
-                e = event(eventId=r[0], type='W', refinedType=r[2], startTime=r[3], endTime=r[4], locationLat=0, locationLng=0,  
-                          distance=0, airportCode=r[8], number=0, street='NA', side='NA', city='NA', county='NA', state='NA', 
-                          zipCode='NA', childs=childs, parents=parents, toBeMerged=False, modified=False)
-                events[e.eventId] = e
-                airport_to_weather_event[r[8]] = events
-            else:
-                if len(r[15]) == 0:
-                    continue
-                if r[15] in zip_to_traffic_event:
-                    events = zip_to_traffic_event[r[15]]
-                childs = set()
-                parents = set()
-                e = event(eventId=r[0], type='T', refinedType=r[2], startTime=r[3], endTime=r[4], locationLat=float(r[5]), locationLng=float(r[6]), 
-                          distance=float(r[7]), airportCode=r[15], number=(0 if r[9]=='N/A' else int(r[9])), street=r[10], side=r[11], city=r[12], 
-                          county=r[13], state=r[14], zipCode=r[15], childs=childs, parents=parents, toBeMerged=False, modified=False)
-                events[e.eventId] = e
-                zip_to_traffic_event[r[15]] = events  
-             
-            count += 1
-            if count%100000 == 0: print('processed {} lines from all event data file.'.format(count))
-               
+        count += 1
+        if count%10000 == 0: print('processed {} lines from all event data file.'.format(count))
+        #chunk_list_traffic.append(zip_to_traffic_event)
+        #chunk_list_weather.append(airport_to_weather_event)
+    #total_traffic = pd.concat(chunk_list_traffic, ignore_index= True)
+    #total_traffic.reset_index(drop = True)    
+    #total_weather = pd.concat(chunk_list_weather, ignore_index= True)
+    #total_weather.reset_index(drop = True)
     print ('Event data is loaded in: %.1f sec'%(time.time()-start))
-    return zip_to_traffic_event, airport_to_weather_event
+    return zip_to_traffic_event, airport_to_weather_event #total_traffic, total_weather
 
     
 def integrateSimilarTrafficIncidents(trTimeThresh = 5, distanceThresh = 0.2): 
@@ -148,7 +151,7 @@ def integrateSimilarTrafficIncidents(trTimeThresh = 5, distanceThresh = 0.2):
     for z in zipToAirport:            
         count += 1
         if count%10 == 0:
-            print 'Processed %d zips, progress: %.2f' % (count, float(count)/len(zipToAirport)*100)
+            print ('Processed %d zips, progress: %.2f' % (count, float(count)/len(zipToAirport)*100))
         
         incidents = {}            
         if z in zip_to_traffic_event: 
@@ -197,7 +200,7 @@ def integrateSimilarWeatherEvents():
     for a in airport_to_weather_event:      
         count += 1
         if count%10 == 0:
-            print 'Processed %d Airport Stations, progress: %.2f' % (count, float(count)/len(airport_to_weather_event)*100)
+            print ('Processed %d Airport Stations, progress: %.2f' % (count, float(count)/len(airport_to_weather_event)*100))
                   
         events = airport_to_weather_event[a]
         if len(events) == 0:
@@ -242,46 +245,51 @@ def writeIntegratedIncidentsAndEvents():
         header = True
         for line in f:
             if header:
-                w.write(line)
+                w.write('EventId,Type(W/T),RefinedType,StartTime(UTC),EndTime(UTC),LocationLat,LocationLng,Distance(mi),AirportCode,Number,Street,Side,City,County,State,ZipCode\n')
                 header = False
                 continue
             parts = line.replace('\r', '').replace('\n', '').split(',')
             if parts[1] == 'W':
-                events = airport_to_weather_event[parts[8]]
+                events = airport_to_weather_event[parts[12]]
                 e = events[parts[0]]
+                refined = ('' if isinstance(parts[2], float) else parts[2]) + '-' + ('' if isinstance(parts[3], float) else parts[3])
                 if e.toBeMerged == True:
                     continue
                 if e.modified == False:
-                    w.write(line)
+                    w.write(parts[0] + ',' + parts[1] + ',' + refined + ',' + parts[6] + ',' + parts[7] + ',' + 
+                    parts[9] + ',' + parts[10] + ',' + parts[11] + ',' + parts[12] + ',' + parts[13] + ',' + parts[14] + ',' + 
+                    parts[15] + ',' + parts[16] + ',' + parts[17] + ',' + parts[18] + ',' + parts[19] + '\n')
                 else:
-                    w.write(parts[0] + ',' + parts[1] + ',' + parts[2] + ',')
+                    w.write(parts[0] + ',' + parts[1] + ',' + refined + ',')
                     w.write(e.startTime.strftime('%Y-%m-%d %H:%M:%S') + ',' + e.endTime.strftime('%Y-%m-%d %H:%M:%S'))
-                    for i in range(5, len(parts)):
+                    for i in range(9, len(parts)):
                         w.write(',' + parts[i])
                     w.write('\n')
             elif parts[1] == 'T':
-#                 if parts[15] not in zip_to_traffic_event:
-#                     w.write(line)
-                incidents = zip_to_traffic_event[parts[15]]                
+                if parts[19] not in zip_to_traffic_event:
+                    continue
+                incidents = zip_to_traffic_event[parts[19]]                
                 e = incidents[parts[0]]
                 if e.toBeMerged == True:
                     continue
                 if e.modified == False:
-                    w.write(line)
+                    w.write(parts[0] + ',' + parts[1] + ',' + refined + ',' + parts[6] + ',' + parts[7] + ',' + 
+                    parts[9] + ',' + parts[10] + ',' + parts[11] + ',' + parts[12] + ',' + parts[13] + ',' + parts[14] + ',' + 
+                    parts[15] + ',' + parts[16] + ',' + parts[17] + ',' + parts[18] + ',' + parts[19] + '\n')
                 else:
-                    w.write(parts[0] + ',' + parts[1] + ',' + parts[2] + ',')
+                    w.write(parts[0] + ',' + parts[1] + ',' + refined + ',')
                     w.write(e.startTime.strftime('%Y-%m-%d %H:%M:%S') + ',' + e.endTime.strftime('%Y-%m-%d %H:%M:%S') + ',' +
-                            parts[5] + ',' + parts[6] + ',' + str(e.distance))
-                    for i in range(8, len(parts)):
+                            parts[9] + ',' + parts[10] + ',' + str(e.distance))
+                    for i in range(12, len(parts)):
                         w.write(',' + parts[i])
                     w.write('\n')
                
     w.close()
-    print 'Distinct events/incidents are written in: %.1f sec'%(time.time()-start)
+    print ('Distinct events/incidents are written in: %.1f sec'%(time.time()-start))
    
 
 if __name__ == "__main__":  
-    path = '/users/PAS0536/osu9965/Traffic/EventProcessing/Data/'
+    path = './data/'
     zipToAirport = loadZipToAirportCode()
     zip_to_traffic_event, airport_to_weather_event = loadEventData() 
     

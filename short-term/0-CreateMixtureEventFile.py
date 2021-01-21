@@ -13,7 +13,10 @@ files = ['WeatherEvents_Aug16_June20_Publish', 'TrafficEvents_Aug16_June20_Publi
 
 
 writer = open(main_path + 'AllEvents_EntireData.csv', 'w')
-writer.write('EventId,Type(W/T),RefinedType,StartTime(UTC),EndTime(UTC),LocationLat,LocationLng,Distance(mi),AirportCode,Number,Street,Side,City,County,State,ZipCode\n')
+writer.write('EventId,Type(W/T),RefinedType,                        StartTime(UTC),         EndTime(UTC),              LocationLat,LocationLng,Distance(mi),AirportCode,Number,Street,Side,City,County,State,ZipCode\n')
+#               0        1          2                                     3                     4                            5          6           7           8         9      10    11   12   13     14     15
+#             'EventId Source  Type Severity  TMC  Description       StartTime(UTC)         EndTime(UTC)     TimeZone  LocationLat  LocationLng  Distance(mi) AirportCode  Number  Street  Side      City    County State  ZipCode'
+##               0       1       2     3       4       5                  6                     7               8          9           10           11           12           13     14     15        16       17     18      19
 
 weatherId = set()
 trafficId = set()

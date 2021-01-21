@@ -7,7 +7,6 @@ This code is to find correlated events and specify childs and parents for a give
 import time
 import math
 from datetime import date, datetime, timedelta
-import thread
 import threading
 
 class event:
@@ -118,13 +117,13 @@ def loadEventData():
                 childs = set()
                 parents = set()
                 e = event(eventId=r[0], type='T', refinedType=r[2], startTime=r[3], endTime=r[4], locationLat=float(r[5]), 
-                          locationLng=float(r[6]), distance=float(r[7]), airportCode=r[15], number=(0 if r[9]=='N/A' else int(r[9])), 
+                          locationLng=float(r[6]), distance=float(r[7]), airportCode=r[15], number=(0 if r[9]=='' else int(r[9])), 
                           street=r[10], side=r[11], city=r[12], county=r[13], state=r[14], zipCode=r[15], childs=childs, parents=parents)
                 events[e.eventId] = e
                 zip_to_traffic_event[r[15]] = events  
             
             count += 1
-            if count %100000 ==0: print 'processed {} lines'.format(count)
+            if count %100000 ==0: print ('processed {} lines'.format(count))
                     
             
     print ('Event data is loaded in: %.1f sec'%(time.time()-start))
@@ -139,7 +138,7 @@ def findChildParents(wTimeThreshs, trTimeThresh = 10, distanceThresh = 0.2):
     for z in zipToAirport:      
         count += 1
         if count%10 == 0:
-            print '#Processed Zips: %d, progress: %.2f' % (count, float(count)/len(zipToAirport)*100)
+            print ('#Processed Zips: %d, progress: %.2f' % (count, float(count)/len(zipToAirport)*100))
               
         incidents = {}
         events = {}
@@ -199,7 +198,7 @@ def findChildParents(wTimeThreshs, trTimeThresh = 10, distanceThresh = 0.2):
         if len(events) > 0:
             airport_to_weather_event[zipToAirport[z]] = events
     
-    print '\n%d Child-Parents are found in: %.1f sec'%(totalRels, time.time()-start)
+    print ('\n%d Child-Parents are found in: %.1f sec'%(totalRels, time.time()-start))
     return zip_to_traffic_event, airport_to_weather_event
 
 def writeAllEvents():
@@ -242,7 +241,7 @@ def writeAllEvents():
     
 
 if __name__ == "__main__":  	
-	path = '/users/PAS0536/osu9965/Traffic/EventProcessing/Data/'
+	path = './data/'
 	zipToAirport = loadZipToAirportCode()
 	zip_to_traffic_event, airport_to_weather_event = loadEventData()
 	wTimeThreshs = {'rain-light':5, 'rain-moderate': 10, 'rain-heavy':15, 'snow-light':20, 'snow-moderate': 40, 'snow-heavy': 60}  #Will be completed based on different weather event types 

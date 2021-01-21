@@ -3,7 +3,7 @@ Created on Jul 8, 2018
 This code is to feed tree encodings to SLEUTH tree mining C++ code and get the frequent embedded (or maybe induced) unordered tree patterns.  
 @author: sobhan
 '''
-import cPickle
+import pickle
 import time
 from time import sleep
 import csv
@@ -92,12 +92,16 @@ def sleuth(z, encodings, i_e = 'E'):
     w.close()
     return total, passed
     
-path = '/users/PAS0536/osu9965/Traffic/EventProcessing/'
+path = './data/'
 
 # load pickle files related to tree-encoding for all zip-codes
 start = time.time()
-zipToEncoding = cPickle.load(file(path + 'Data/Data_SlowCong/zipToEncoding.pkl', 'r'))
-labelToCode   = cPickle.load(file(path + 'Data/Data_SlowCong/labelToCode.pkl', 'r'))
+
+with open(path + 'zipToEncoding.pkl', 'rb') as file_read:
+    zipToEncoding = pickle.load(file_read)
+
+with open(path + 'labelToCode.pkl', 'rb') as file_read:
+    labelToCode   = pickle.load(file_read)
 
 # load zip to city
 zipToCity = readCsvToDict('Data/zip_to_CityState.csv')
@@ -113,7 +117,7 @@ for z in zipToEncoding:
     if s in cityToZips: _zips = cityToZips[s]
     _zips.append(z)
     cityToZips[s] = _zips
-print 'All datasets are loaded for %d zip codes in %.1f sec!' % (len(zipToEncoding), time.time()-start)
+print ('All datasets are loaded for %d zip codes in %.1f sec!' % (len(zipToEncoding), time.time()-start))
 
 # the output file for frequent tree patterns
 file_name = 'frequent_trees_City_MSF-{}_MTL-{}_SlowCong.csv'.format(min_sup_fixed, max_tree_length)
@@ -168,12 +172,12 @@ for s in cityToZips:
     
     processed_citities += 1
     if processed_citities%100 == 0:
-        print 'Processed {} cities out of {}, progress: {:.2f}%!'.format(processed_citities, len(cityToZips), float(processed_citities)/len(cityToZips)*100)
+        print ('Processed {} cities out of {}, progress: {:.2f}%!'.format(processed_citities, len(cityToZips), float(processed_citities)/len(cityToZips)*100))
     #if st_count == 10: break
 
   
-print 'Pattern mining process is completed in %.1f sec!' %(time.time()-start)
-print 'Total Trees: %d, Total Passed the Criteria: %d, Pass Ratio %.2f' %(Total, Passed, (float(Passed)/Total)*100)
+print ('Pattern mining process is completed in %.1f sec!' %(time.time()-start))
+print ('Total Trees: %d, Total Passed the Criteria: %d, Pass Ratio %.2f' %(Total, Passed, (float(Passed)/Total)*100))
 
 for st in state_total_pattern:
     writer.write(st + ',' + str(state_total_pattern[st]) + '\n')

@@ -23,7 +23,7 @@ def loadAllEvents():
     allEvents = {}
     count = 0
     
-    with open(path + 'AllEvents_CP_Aug2016-Aug2018.csv', 'r') as lines:
+    with open(path + 'AllEvents_CP.csv', 'r') as lines:
         header = True
         for r in lines:
             if header:
@@ -36,7 +36,7 @@ def loadAllEvents():
             count += 1
             if count%500000 == 0: print('Loaded {} events!'.format(count))       
         
-    print len(allEvents), 'events are loaded! \n'
+    print (len(allEvents), 'events are loaded! \n')
     return allEvents
 
 '''This function extracts and return all the existing sequences, given a node as root node'''
@@ -133,7 +133,7 @@ def findSequences():
         
         totalSeqs += len(seq)
         if totalSeqs % 50000 ==0:
-            print 'totalSeqs:', totalSeqs
+            print ('totalSeqs:', totalSeqs)
         
         idx = 0
         for s in seq:
@@ -151,7 +151,7 @@ def findSequences():
             
             idx += 1
     
-    print 'total extracted sequential patterns:', totalSeqs
+    print ('total extracted sequential patterns:', totalSeqs)
     return zip_to_sequences
 
 def printSequences():
@@ -166,7 +166,7 @@ def printSequences():
     writer.close()     
 
 
-path = '/users/PAS0536/osu9965/Traffic/EventProcessing/Data/'
+path = './data/'
                                                              
 allEvents = loadAllEvents()        
 zip_to_sequences = findSequences()
