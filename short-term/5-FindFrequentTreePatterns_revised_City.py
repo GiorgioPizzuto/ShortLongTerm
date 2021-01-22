@@ -91,11 +91,12 @@ def sleuth(z, encodings, i_e = 'E'):
         
     w.close()
     return total, passed
+
+start = time.time()
     
 path = './data/'
 
 # load pickle files related to tree-encoding for all zip-codes
-start = time.time()
 
 with open(path + 'zipToEncoding.pkl', 'rb') as file_read:
     zipToEncoding = pickle.load(file_read)

@@ -1,8 +1,26 @@
 import pandas as pd
 import winsound
 import math
+import pickle
+
 duration = 1000  # milliseconds
 freq = 440  # Hz
+
+path = './data/'
+
+# load pickle files related to tree-encoding for all zip-codes
+
+with open(path + 'zipToEncoding.pkl', 'rb') as file_read:
+    zipToEncoding = pickle.load(file_read)
+
+with open(path + 'labelToCode.pkl', 'rb') as file_read:
+    labelToCode   = pickle.load(file_read)
+
+for i,j in zipToEncoding.items:
+    print( i,j)
+    input('w')
+winsound.Beep(freq, duration)
+'''
 data = pd.DataFrame()
 
 df_chunk = pd.read_csv('./data/SequentialPatterns.csv', dtype = str, usecols = ['Pattern'] , squeeze = True) #, chunksize = 1000
@@ -17,9 +35,6 @@ for c in df_chunk:
         # input('w')
 for p in setp:
     print(p)
-
-winsound.Beep(freq, duration)
-'''
 
 chunk_list = []  
 
