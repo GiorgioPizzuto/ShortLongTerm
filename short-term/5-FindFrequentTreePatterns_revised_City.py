@@ -46,8 +46,9 @@ def readCsvToDict(file):
     reader = csv.reader(open(path + file, 'r'))
     d = {}
     for row in reader:
-       k, v = row
-       d[k] = v
+        if row:
+            k, v = row
+            d[k] = v
     return d
 
     
@@ -55,7 +56,7 @@ def sleuth(z, encodings, i_e = 'E'):
     total=passed = 0
     # make temporary db for encodings
     #print len(encodings)
-    input_name = 'tmp/input_' + file_name + '.db'
+    input_name = 'input_' + file_name + '.db'
     w = open(path + input_name, 'w')
     lg = 0
     for e in encodings: 
@@ -75,7 +76,7 @@ def sleuth(z, encodings, i_e = 'E'):
     
     # run sleuth algorithm to find frequent induced/embedded unordered tree patterns
     #subprocess.call(['./vtreeminer', '-i', '/users/PAS0536/osu9965/Traffic/EventProcessing/' + input_name, '-S', str(min_sup), '-o'])  #using capital S to have absolute support value!
-    out = check_output(['./vtreeminer', '-i', '/users/PAS0536/osu9965/Traffic/EventProcessing/' + input_name, '-S', str(min_sup), '-o'])
+    out = check_output(['./cpp_codes/vtreeminer', '-i', './data/' + input_name, '-S', str(min_sup), '-o'])
     w = open(path + file_name, 'a')
     #print out.split('F')[0].split(')')[1]
     out = out.split('F')[0].split(')')[1].split('\n')
@@ -105,10 +106,10 @@ with open(path + 'labelToCode.pkl', 'rb') as file_read:
     labelToCode   = pickle.load(file_read)
 
 # load zip to city
-zipToCity = readCsvToDict('Data/zip_to_CityState.csv')
+zipToCity = readCsvToDict('zip_to_CityState.csv')
 
 # load zip to State
-zipToState = readCsvToDict('Data/zip_to_State.csv')
+zipToState = readCsvToDict('zip_to_State.csv')
 
 cityToZips = {}
 for z in zipToEncoding:
