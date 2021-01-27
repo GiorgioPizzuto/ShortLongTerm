@@ -76,7 +76,7 @@ def sleuth(z, encodings, i_e = 'E'):
     
     # run sleuth algorithm to find frequent induced/embedded unordered tree patterns
     #subprocess.call(['./vtreeminer', '-i', '/users/PAS0536/osu9965/Traffic/EventProcessing/' + input_name, '-S', str(min_sup), '-o'])  #using capital S to have absolute support value!
-    out = check_output(['./cpp_codes/vtreeminer', '-i', './data/' + input_name, '-S', str(min_sup), '-o'])
+    out = check_output(['./cpp_codes/vtreeminer.exe', '-i', './data/' + input_name, '-S', str(min_sup), '-o'])
     w = open(path + file_name, 'a')
     #print out.split('F')[0].split(')')[1]
     out = out.split('F')[0].split(')')[1].split('\n')
