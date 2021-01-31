@@ -55,31 +55,27 @@ def readCsvToDict(file):
 def sleuth(z, encodings, i_e = 'E'):
     total=passed = 0
     # make temporary db for encodings
-    #print len(encodings)
-    input_name = 'input_' + file_name + '.db'
-    w = open(path + input_name, 'w')
+    #print (len(encodings))
+    input_name ='input_' + file_name + '.db' 
+    w = open( path + input_name, 'wb') 
     lg = 0
     for e in encodings: 
         l = int(e.split(' ')[2])        
-        if l<max_tree_length:       
-            w.write(e + '\n')
+        if l<max_tree_length:     
+            w.write((e + '\n').encode("UTF-8"))
             lg+=1           
     w.close()
-    
     total += len(encodings)
     passed += lg
-    
+
     #print ('Length after filtering by tree length ==>', lg)
     min_sup = min(return_minsup(lg), min_sup_fixed)
     #return total, passed
-    #min_sup = 100
-    
     # run sleuth algorithm to find frequent induced/embedded unordered tree patterns
     #subprocess.call(['./vtreeminer', '-i', '/users/PAS0536/osu9965/Traffic/EventProcessing/' + input_name, '-S', str(min_sup), '-o'])  #using capital S to have absolute support value!
-    out = check_output(['./cpp_codes/vtreeminer.exe', '-i', './data/' + input_name, '-S', str(min_sup), '-o'])
+    out = check_output(['./cpp_codes/vtreeminer.exe', '-i', path + input_name, '-S', str(min_sup), '-o']) #'./data/' + input_name, str(min_sup)
     w = open(path + file_name, 'a')
-    #print out.split('F')[0].split(')')[1]
-    out = out.split('F')[0].split(')')[1].split('\n')
+    out = out.decode('UTF-8').split('F')[0].split(')')[1].split('\n')
     for p in out:
         if len(p)==0: continue
         sp = int(p.split(' - ')[1])*1.0
@@ -89,7 +85,6 @@ def sleuth(z, encodings, i_e = 'E'):
         if len(p.split(' ')) == 1: continue
         #w.write(z + ',' + p + ',' + str(round(sp/len(encodings), 3)) + '\n')
         w.write(z + ',' + p + ',' + str(round(sp/lg, 3)) + '\n')
-        
     w.close()
     return total, passed
 
@@ -122,7 +117,7 @@ for z in zipToEncoding:
 print ('All datasets are loaded for %d zip codes in %.1f sec!' % (len(zipToEncoding), time.time()-start))
 
 # the output file for frequent tree patterns
-file_name = 'frequent_trees_City_MSF-{}_MTL-{}_SlowCong.csv'.format(min_sup_fixed, max_tree_length)
+file_name = 'frequent_trees_City_MSF-{}_MTL-{}.csv'.format(min_sup_fixed, max_tree_length)
 w = open(path + file_name, 'w')
 w.write('City,Pattern,Support\n')
 w.close()
@@ -136,13 +131,15 @@ start = time.time()
 st_count = 0
 Total, Passed = 0,0
 
-writer = open(path + 'State_TreeCount_CityBased_SlowCong.csv', 'w')
+writer = open(path + 'State_TreeCount_CityBased.csv', 'w')
 writer.write('State,Count\n')
 state_total_pattern = {}
 
 processed_citities = 0
-
+c= 0
 for s in cityToZips:
+    c+=1
+    print(c,end=' ')
     # if s != 'OilCity-PA': continue
     #time.sleep(0.1)
     encodingSet = []
@@ -156,7 +153,8 @@ for s in cityToZips:
             encodingSet.append(enc)
         cnt += 1
         #if cnt ==250:  break
-    
+    #print(encodingSet)
+    #input('w')
     if len(encodingSet) < 50: continue   #trivial cases which we filter for the sake of speed up in the process! this will discriminate 10% of the data, which is negligible!
     #print (str(st_count), 'City:', s, '#Encodings:', len(encodingSet))  
     
