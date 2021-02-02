@@ -86,7 +86,7 @@ def createLabelToCode():
     labelToCode['Rain-Moderate'] = '2'
     labelToCode['Rain-Heavy'] = '2'
     
-    labelToCode['Construction'] = '3'
+    labelToCode['Construction-'] = '3'
     labelToCode['Construction-Other'] = '3'
     labelToCode['Construction-Short'] = '3'
     
@@ -100,24 +100,23 @@ def createLabelToCode():
     labelToCode['Fog-Moderate'] = '6'
     labelToCode['Fog-Severe'] = '6'
     
-    labelToCode['Lane-Blocked'] = '7'
+    labelToCode['Lane-Blocked-'] = '7'
     labelToCode['Cold-Severe'] = '8'
-    labelToCode['Other'] = '9'
-    labelToCode['Storm-Severe'] = '10'
-    labelToCode['Broken-Vehicle'] = '11'
-    labelToCode['Incident-Weather'] = '12'
+    #labelToCode['Other'] = '9'
+    #labelToCode['Storm-Severe'] = '10'
+    labelToCode['Broken-Vehicle-'] = '11'
+    #labelToCode['Incident-Weather'] = '12'
     labelToCode['Precipitation-UNK'] = '13'
-    labelToCode['Hail-Other'] = '14'
-    labelToCode['Incident-Other'] = '15'
-    labelToCode['Incident-Flow'] = '16'
-    labelToCode['Accident'] = '17'
+    #labelToCode['Hail-Other'] = '14'
+    #labelToCode['Incident-Other'] = '15'
+    labelToCode['Flow-Incident-'] = '16'
+    labelToCode['Accident-'] = '17'
     
     return labelToCode
     
 def convertToTreePreOrderedDfsEncoding():
     labelToCode = createLabelToCode()
     zipToEncoding = {}
-    
     for z in zipToRoots:
         roots = zipToRoots[z]
         nodes = zipToNodes[z]
@@ -150,7 +149,7 @@ def convertToTreePreOrderedDfsEncoding():
     
     return zipToEncoding, labelToCode
                 
-                
+
 path = './data/'
 zipToSequences = loadSequenceData()
 print ('Sequences are loaded!')

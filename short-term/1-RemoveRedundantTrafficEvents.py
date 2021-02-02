@@ -270,6 +270,7 @@ def writeIntegratedIncidentsAndEvents():
                     continue
                 incidents = zip_to_traffic_event[parts[19]]                
                 e = incidents[parts[0]]
+                refined = ('' if isinstance(parts[2], float) else parts[2]) + '-' + ('' if isinstance(parts[3], float) else parts[3])
                 if e.toBeMerged == True:
                     continue
                 if e.modified == False:
