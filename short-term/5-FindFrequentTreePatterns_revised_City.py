@@ -18,6 +18,7 @@ parser.add_argument('--min_sup_fixed', type=int, default=500)
 parser.add_argument('--max_tree_length', type=int, default=25)
 args = parser.parse_args()
 min_sup_fixed = args.min_sup_fixed
+#min_sup_fixed = 0.05
 max_tree_length = args.max_tree_length
 
 
@@ -68,7 +69,7 @@ def sleuth(z, encodings, i_e = 'E'):
     total += len(encodings)
     passed += lg
 
-    print(passed)
+    #print(passed)
     #print ('Length after filtering by tree length ==>', lg)
     min_sup = min(return_minsup(lg), min_sup_fixed)
     #return total, passed

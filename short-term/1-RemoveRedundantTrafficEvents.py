@@ -110,7 +110,8 @@ def loadEventData():
                 events = airport_to_weather_event[r[12]]
             childs = set()
             parents = set()
-            e = event(eventId=r[0], type='W', refinedType=r[2]+ '-' + r[3], startTime=r[6], endTime=r[7], locationLat=0, locationLng=0,  
+            refined = ('' if isinstance(r[2], float) else r[2]) + '-' + ('' if isinstance(r[3], float) else r[3])
+            e = event(eventId=r[0], type='W', refinedType=refined, startTime=r[6], endTime=r[7], locationLat=0, locationLng=0,  
                         distance=0, airportCode=r[12], number=0, street='NA', side='NA', city='NA', county='NA', state='NA', 
                         zipCode='NA', childs=childs, parents=parents, toBeMerged=False, modified=False)
             events[e.eventId] = e
